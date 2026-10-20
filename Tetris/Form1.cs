@@ -92,10 +92,10 @@ namespace Tetris
         {
             switch (e.KeyCode)
             {
-                case Keys.Right:    MoveRight();    return;
-                case Keys.Left:     MoveLeft();     return;
-                case Keys.Space:    MoveDown();     return;    // 한번에 한번씩 내려감
-                case Keys.Up:       MoveTurn();     return;    // 한번에 다 내려감
+                case Keys.Right:case Keys.D:     MoveRight();    return;
+                case Keys.Left: case Keys.A:     MoveLeft();     return;
+                case Keys.Down: case Keys.S:     MoveDown();     return;    // 한번에 한번씩 내려감
+                case Keys.Space:                 MoveTurn();     return;    // 한번에 다 내려감
             }
         }
 
