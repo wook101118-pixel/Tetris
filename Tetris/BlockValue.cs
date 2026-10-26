@@ -8,7 +8,7 @@ namespace Tetris
 {
     internal class BlockValue
     {
-        int[,,,] bvalues = new int[7, 4, 4, 4]
+        public static readonly int[,,,] bvalues = new int[7, 4, 4, 4]
         {
             #region 1. 길쭉이
             {
@@ -72,7 +72,7 @@ namespace Tetris
                  }
             },
             #endregion
-            #region 3.  6칸 ㄱ 
+            #region 3.6칸 ㄱ 
             {
                  {
                      { 0, 0, 1, 0},
@@ -138,8 +138,8 @@ namespace Tetris
             {
                  {
                      { 0, 0, 0, 0},
-                     { 0, 0, 1, 1},
-                     { 0, 0, 1, 1},
+                     { 0, 1, 1, 0},
+                     { 0, 1, 1, 0},
                      { 0, 0, 0, 0},
                  },
                  {
@@ -158,9 +158,9 @@ namespace Tetris
 
                  {
                      { 0, 0, 0, 0},
+                     { 0, 1, 1, 0},
+                     { 0, 1, 1, 0},
                      { 0, 0, 0, 0},
-                     { 0, 1, 1, 0},
-                     { 0, 1, 1, 0},
                  }
             },
             #endregion
@@ -181,9 +181,9 @@ namespace Tetris
                  },
 
                  {
-                     { 0, 1, 1, 1},
-                     { 0, 1, 1, 1},
-                     { 1, 1, 1, 1},
+                     { 0, 0, 1, 1},
+                     { 0, 0, 1, 1},
+                     { 0, 0, 1, 1},
                      { 0, 0, 1, 1},
                  },
 
@@ -195,12 +195,12 @@ namespace Tetris
                  }
             },
             #endregion
-                        #region 7. 점박이
+            #region 7. 점박이
             {
                  {
                      { 0, 0, 0, 0},
                      { 0, 0, 0, 0},
-                     { 0, 0, 1, 0},
+                     { 1, 1, 1, 1},
                      { 0, 0, 0, 0},
                  },
 
@@ -229,6 +229,3 @@ namespace Tetris
         };
     }
 }
-
-            
-

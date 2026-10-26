@@ -19,7 +19,7 @@ namespace Tetris
             {
                 if (now == null)
                 {
-                    return new Point(0,  0);
+                    return new Point(0, 0);
                 }
                 else
                 {
@@ -28,7 +28,23 @@ namespace Tetris
             }
         }
 
-        internal static Game Singleton {get; private set;}
+        public int BlockNum
+        {
+            get
+            {
+                return now.BlockNum;
+            }
+        }
+
+        public int Turn
+        {
+            get
+            {
+                return now.Turn;
+            }
+        }
+
+        internal static Game Singleton { get; private set; }
 
         // 정적 생성자: 클래스가 처음 사용될 때 한 번만 호출됨
         static Game()
@@ -39,37 +55,93 @@ namespace Tetris
         // 일반 생성자: 외부에서 호출할 수 없음
         private Game()
         {
-            now = new Diagram();   
+            now = new Diagram();
         }
 
         internal bool MoveLeft()
         {
-            if (now.X > 0)
+            for (int xx = 0; xx < 4; xx++)
             {
-                now.MoveLeft();
-                return true;
+                for (int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[now.BlockNum, Turn, xx, yy] != 0)
+                    {
+                        if (now.X + xx <= 0)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
-            return false;
+
+            now.MoveLeft();
+            return true;
         }
 
         internal bool MoveRight()
         {
-            if (now.X + 1 < GameRule.B_WIDTH_COUNT)
+            for (int xx = 0; xx < 4; xx++)
             {
-                now.MoveRight();
-                return true;
+                for (int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[now.BlockNum, Turn, xx, yy] != 0)
+                    {
+                        if (now.X + xx + 1 >= GameRule.B_WIDTH)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
-            return false;
+
+            now.MoveRight();
+            return true;
         }
 
         internal bool MoveDown()
         {
-            if (now.Y + 1 < GameRule.B_HEIGHT_COUNT)
+            for (int xx = 0; xx < 4; xx++)
             {
-                now.MoveDown();
-                return true;
+                for (int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[now.BlockNum, Turn, xx, yy] != 0)
+                    {
+                        if(now.Y + yy + 1 >= GameRule.B_HEIGHT)
+                        {
+                            return false;
+                        }
+                    }
+                }
             }
-            return false;
+
+            now.MoveDown();
+            return true;
+        }
+
+        internal bool MoveTurn()
+        {
+            for (int xx = 0; xx < 4; xx++)
+            {
+                for(int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[now.BlockNum, (Turn + 1) % 4, xx, yy] != 0)
+                    {
+                        if (now.X + xx <= 0 || now.X + xx + 1 >= GameRule.B_WIDTH
+                            || now.Y + yy + 1 >= GameRule.B_HEIGHT)
+                        {
+                            return false;
+                        }
+                    }
+                }
+            }
+
+            now.MoveTurn();
+            return true;
+        }
+
+        internal void Next()
+        {
+            now.Setup();
         }
     }
 }

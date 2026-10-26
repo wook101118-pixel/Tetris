@@ -82,10 +82,24 @@ namespace Tetris
 
         private void DrawDiagram(Graphics graphics)
         {
-            var depen       = new Pen(Color.Red, 4);                                                                        // Pen
-            var nowPos      = game.NowPosition;                                                                             // Point
-            var rectangle   = new Rectangle(nowPos.X * b_width + 2, nowPos.Y * b_height + 2, b_width - 4, b_height - 4);    // Rectangle
-            graphics.DrawRectangle(depen, rectangle);
+            var depen       = new Pen(Color.Red, 4);        // Pen
+            var nowPos      = game.NowPosition;             // Point
+            int blockNum    = game.BlockNum;
+            int turnNum     = game.Turn;
+
+            for (int xx = 0; xx < 4; xx++)
+            {
+                for (int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[blockNum, turnNum,xx,yy] != 0)
+                    {
+                        var rectangle   = new Rectangle(nowPos.X * b_width + 2, nowPos.Y * b_height + 2
+                            , b_width - 4, b_height - 4);   // Rectangle
+                        graphics.DrawRectangle(depen, rectangle);
+
+                    }
+                }
+            }
         }
 
         private void Form1_KeyDown(object sender, KeyEventArgs e)
@@ -128,23 +142,46 @@ namespace Tetris
 
         private void MoveTurn()
         {
-           
+           if (game.MoveTurn())
+            {
+                Region region = MakeRegion();
+                Invalidate(region);
+            }
+        }
+
+        // 회전 전용
+        private Region MakeRegion()
+        {
+            throw new NotImplementedException();
         }
 
         private Region MakeRegion(int changeX, int changeY)
         {
-           var nowPos = game.NowPosition;  // Point
-           // 현재 사각형
-           var currentRect = new Rectangle(nowPos.X * b_width, nowPos.Y * b_height, b_width, b_height);                             // Rectangle
-           // 이동 전 사각형
-           var previousRect = new Rectangle((nowPos.X + changeX) * b_width, (nowPos.Y + changeY) * b_height, b_width, b_height);    // Rectangle
-           
-           var region_00 = new Region(currentRect);    // Region
-           var region_01 = new Region(previousRect);   // Region
-            
-           // 두 사각형의 합집합
-           region_00.Union(region_01);
-           return region_00;
+           var nowPos    = game.NowPosition;  // Point
+           int blockNum  = game.BlockNum;
+           int turnNum  = game.Turn;
+           var region    = new Region();
+
+           for (int xx = 0; xx < 4; xx++)
+           {
+                for (int yy = 0; yy< 4; yy++)
+                {
+                    // 현재(이동 후) 사각형
+                    var currentRect   = new Rectangle(nowPos.X * b_width, nowPos.Y * b_height
+                        , b_width, b_height);     // Rectangle
+                    // 이동 전 사각형
+                    var previousRect  = new Rectangle((nowPos.X + changeX) * b_width, (nowPos.Y + changeY) * b_height
+                        , b_width, b_height);    // Rectangle
+                    
+                    var region_00 = new Region(currentRect);    // Region
+                    var region_01 = new Region(previousRect);   // Region
+
+                    region.Union(region_00);
+                    region.Union(region_01);
+                }
+           }
+
+            return region;
         }
 
         private void timer1_Tick(object sender, EventArgs e)
