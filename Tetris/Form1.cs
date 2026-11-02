@@ -39,6 +39,24 @@ namespace Tetris
         {
             DrawLines(e.Graphics);
             DrawDiagram(e.Graphics);
+            DoubleBuffered = true;  // 화면 깜빡임 문제를 홰결
+            DrawBoard(e.Graphics);
+        }
+
+        private void DrawBoard(Graphics graphics)
+        {
+            for (int xx = 0; xx < b_width_count; xx++)
+            {
+                for (int yy = 0; yy < b_height_count; yy++)
+                {
+                    if (game[xx, yy] != 0)
+                    {
+                        var rectangle = new Rectangle(xx * b_width + 2, yy * b_height + 2, b_width - 4, b_height - 4);
+                        graphics.DrawRectangle(Pens.HotPink, rectangle);
+                        graphics.FillRectangle(Brushes.HotPink, rectangle);
+                    }
+                }
+            }
         }
 
         private void DrawLines(Graphics graphics)
@@ -93,7 +111,7 @@ namespace Tetris
                 {
                     if (BlockValue.bvalues[blockNum, turnNum,xx,yy] != 0)
                     {
-                        var rectangle   = new Rectangle(nowPos.X * b_width + 2, nowPos.Y * b_height + 2
+                        var rectangle   = new Rectangle((nowPos.X + xx) * b_width + 2, (nowPos.Y + yy) * b_height + 2
                             , b_width - 4, b_height - 4);   // Rectangle
                         graphics.DrawRectangle(depen, rectangle);
 
@@ -109,8 +127,21 @@ namespace Tetris
                 case Keys.Right:case Keys.D:     MoveRight();    return;
                 case Keys.Left: case Keys.A:     MoveLeft();     return;
                 case Keys.Down: case Keys.S:     MoveDown();     return;    // 한번에 한번씩 내려감
-                case Keys.Space:                 MoveTurn();     return;    // 한번에 다 내려감
+                case Keys.Space:                 MoveTurn();     return;    //= 회전
+                case Keys.Enter:                 MoveSuperDown(); return;    // 한번에 다 내려감
             }
+        }
+
+        private void MoveSuperDown()
+        {
+            while (game.MoveDown())
+            {
+                var region = MakeRegion(0, -1);     // Region
+                Invalidate(region);
+            }
+
+            game.Next();
+            Invalidate();                           
         }
 
         private void MoveRight()
@@ -138,6 +169,11 @@ namespace Tetris
                 var region = MakeRegion(0, -1);     // Region
                 Invalidate(region);
             }
+            else
+            {
+                game.Next();
+                Invalidate();
+            }
         }
 
         private void MoveTurn()
@@ -152,7 +188,33 @@ namespace Tetris
         // 회전 전용
         private Region MakeRegion()
         {
-            throw new NotImplementedException();
+            Point now = game.NowPosition;
+            int blockNum = game.BlockNum;
+            int turnNum = game.Turn;
+            int oldturnNum = (turnNum + 3) % 4;
+
+            Region region = new Region();
+
+            for (int xx = 0; xx < 4; xx++)
+            {
+                for (int yy = 0; yy < 4; yy++)
+                {
+                    if (BlockValue.bvalues[blockNum, turnNum, xx, yy] != 0)
+                    {
+                        Rectangle rect1 = new Rectangle((now.X + xx) * b_width, (now.Y + yy) * b_height, b_width, b_height);
+                        Region rg1 = new Region(rect1);
+                        region.Union(rg1);
+                    }
+
+                    if (BlockValue.bvalues[blockNum, oldturnNum, xx ,yy] != 0)
+                    {
+                        Rectangle rect2 = new Rectangle((now.X + xx) * b_width, (now.Y + yy) * b_height, b_width, b_height);
+                        Region rg2 = new Region(rect2);
+                        region.Union(rg2);
+                    }
+                }
+            }
+            return region;
         }
 
         private Region MakeRegion(int changeX, int changeY)
@@ -166,18 +228,21 @@ namespace Tetris
            {
                 for (int yy = 0; yy< 4; yy++)
                 {
-                    // 현재(이동 후) 사각형
-                    var currentRect   = new Rectangle(nowPos.X * b_width, nowPos.Y * b_height
-                        , b_width, b_height);     // Rectangle
-                    // 이동 전 사각형
-                    var previousRect  = new Rectangle((nowPos.X + changeX) * b_width, (nowPos.Y + changeY) * b_height
-                        , b_width, b_height);    // Rectangle
-                    
-                    var region_00 = new Region(currentRect);    // Region
-                    var region_01 = new Region(previousRect);   // Region
+                    if (BlockValue.bvalues[blockNum, turnNum, xx, yy] != 0)
+                    {
+                        // 현재(이동 후) 사각형
+                        var currentRect = new Rectangle((nowPos.X + xx) * b_width, (nowPos.Y + yy) * b_height
+                            , b_width, b_height);     // Rectangle
+                                                      // 이동 전 사각형
+                        var previousRect = new Rectangle((nowPos.X + xx + changeX) * b_width, (nowPos.Y + yy + changeY) * b_height
+                            , b_width, b_height);    // Rectangle
 
-                    region.Union(region_00);
-                    region.Union(region_01);
+                        var region_00 = new Region(currentRect);    // Region
+                        var region_01 = new Region(previousRect);   // Region
+
+                        region.Union(region_00);
+                        region.Union(region_01);
+                    }
                 }
            }
 

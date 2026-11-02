@@ -13,6 +13,15 @@ namespace Tetris
         //private readonly static Game _instance = new Game();
         //public static Game Instance = _instance;
         private Diagram now;
+        Board gboard = Board.GameBoard;
+
+        internal int this[int x, int y]
+        {
+            get
+            {
+                return gboard[x, y];
+            }
+        }
         internal Point NowPosition
         {
             get
@@ -74,8 +83,13 @@ namespace Tetris
                 }
             }
 
-            now.MoveLeft();
-            return true;
+            if (gboard.MoveEnable(now.BlockNum, Turn, now.X - 1, now.Y))
+            {
+                now.MoveLeft();
+                return true;
+            }
+
+            return false;
         }
 
         internal bool MoveRight()
@@ -86,7 +100,7 @@ namespace Tetris
                 {
                     if (BlockValue.bvalues[now.BlockNum, Turn, xx, yy] != 0)
                     {
-                        if (now.X + xx + 1 >= GameRule.B_WIDTH)
+                        if (now.X + xx + 1 >= GameRule.B_WIDTH_COUNT)
                         {
                             return false;
                         }
@@ -94,8 +108,13 @@ namespace Tetris
                 }
             }
 
-            now.MoveRight();
-            return true;
+            if (gboard.MoveEnable(now.BlockNum, Turn, now.X + 1, now.Y))
+            {
+                now.MoveRight();
+                return true;
+            }
+
+            return false;
         }
 
         internal bool MoveDown()
@@ -106,16 +125,24 @@ namespace Tetris
                 {
                     if (BlockValue.bvalues[now.BlockNum, Turn, xx, yy] != 0)
                     {
-                        if(now.Y + yy + 1 >= GameRule.B_HEIGHT)
+                        if(now.Y + yy + 1 >= GameRule.B_HEIGHT_COUNT)
                         {
+                            gboard.Store(now.BlockNum, Turn, now.X, now.Y);
                             return false;
                         }
                     }
                 }
             }
 
-            now.MoveDown();
-            return true;
+
+            if (gboard.MoveEnable(now.BlockNum, Turn, now.X, now.Y + 1))
+            {
+                now.MoveDown();
+                return true;
+            }
+
+            gboard.Store(now.BlockNum, Turn, now.X, now.Y);
+            return false;
         }
 
         internal bool MoveTurn()
@@ -126,8 +153,7 @@ namespace Tetris
                 {
                     if (BlockValue.bvalues[now.BlockNum, (Turn + 1) % 4, xx, yy] != 0)
                     {
-                        if (now.X + xx <= 0 || now.X + xx + 1 >= GameRule.B_WIDTH
-                            || now.Y + yy + 1 >= GameRule.B_HEIGHT)
+                        if (now.X + xx < 0 || (now.X + xx >= GameRule.B_WIDTH_COUNT) || now.Y + yy >= GameRule.B_HEIGHT_COUNT)
                         {
                             return false;
                         }
@@ -135,8 +161,13 @@ namespace Tetris
                 }
             }
 
-            now.MoveTurn();
-            return true;
+            if (gboard.MoveEnable(now.BlockNum, (Turn + 1) % 4, now.X, now.Y))
+            {
+                now.MoveTurn();
+                return true;
+            }
+
+            return false;
         }
 
         internal void Next()
