@@ -62,6 +62,58 @@ namespace Tetris
                     }
                 }
             }
+
+            CheckLines(y + 3);
+        }
+
+        private void CheckLines(int v)
+        {
+            for (int yy = 0; yy < 4; yy++)
+            {
+                if (v - yy < GameRule.B_HEIGHT_COUNT)
+                {
+                    if (CheckLine(v - yy))
+                    {
+                        ClearLine(v - yy);
+                        v++;
+                    }
+                }
+            }
+        }
+
+        private void ClearLine(int y)
+        {
+            for (; y > 0; y--)
+            {
+                for (int xx = 0; xx < GameRule.B_WIDTH_COUNT; xx++)
+                {
+                    board[xx, y] = board[xx, y - 1];
+                }
+            }
+        }
+
+        private bool CheckLine(int y)
+        {
+            for (int xx = 0; xx < GameRule.B_WIDTH_COUNT; xx++)
+            {
+                if (board[xx, y] == 0)
+                {
+                    return false;
+                }
+            }
+
+            return true;
+        }
+
+        internal void ClearBoard()
+        {
+            for (int xx = 0; xx < GameRule.B_WIDTH_COUNT; xx++)
+            {
+                for (int yy = 0; yy < GameRule.B_HEIGHT_COUNT; yy++)
+                {
+                    board[xx, yy] = 0;
+                }
+            }
         }
     }
 }

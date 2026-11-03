@@ -170,9 +170,16 @@ namespace Tetris
             return false;
         }
 
-        internal void Next()
+        internal bool Next()
         {
             now.Setup();
+
+            return gboard.MoveEnable(now.BlockNum, Turn, now.X, now.Y);
+        }
+
+        internal void Reset()
+        {
+            gboard.ClearBoard();
         }
     }
 }

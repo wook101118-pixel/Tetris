@@ -140,8 +140,7 @@ namespace Tetris
                 Invalidate(region);
             }
 
-            game.Next();
-            Invalidate();                           
+            EndingCheck();                         
         }
 
         private void MoveRight()
@@ -171,8 +170,31 @@ namespace Tetris
             }
             else
             {
-                game.Next();
+                EndingCheck();
+            }
+        }
+
+        private void EndingCheck()
+        {
+            if (game.Next())
+            {
                 Invalidate();
+            }
+            else
+            {
+                timer1.Enabled = false;
+                DialogResult result = MessageBox.Show("다시시작 하시겠습니까?", "다시시작", MessageBoxButtons.YesNo);
+
+                if (result == DialogResult.Yes)
+                {
+                    game.Reset();
+                    timer1.Enabled = true;
+                    Invalidate();
+                }
+                else
+                {
+                    Close();
+                }
             }
         }
 
